@@ -105,6 +105,22 @@ func (bc *Blockchain) Mining() bool {
 	return true
 }
 
+func (bc *Blockchain) CalculateTotalAmount(blockchainAddress string) float32 {
+	var totalAmount float32 = 0.0
+	for _, b := range bc.chain { //loop through the blockchain
+		for _, t := range b.transactions { //loop through all transactions in blockchain
+			value := t.value //initializes a blank accumulator
+			if blockchainAddress == t.recipientBlockchainAddress {
+				totalAmount += value // counts all received coins when queried address matches with the recipient
+			}
+			if blockchainAddress == t.senderBlockchainAddress {
+				totalAmount -= value // subtracts all sent coins when queried address matches with sender
+			}
+		}
+	}
+	return totalAmount
+}
+
 type Transaction struct {
 	senderBlockchainAddress    string
 	recipientBlockchainAddress string
@@ -191,4 +207,8 @@ func main() {
 	// previousHash = blockChain.LastBlock().Hash()
 	// nonce = blockChain.ProofOfWork()
 	// blockChain.CreateBlock(nonce, previousHash)
+
+	fmt.Printf("C %.1f\n", blockChain.CalculateTotalAmount("my_blockchain_address"))
+	fmt.Printf("C %.1f\n", blockChain.CalculateTotalAmount("C"))
+	fmt.Printf("C %.1f\n", blockChain.CalculateTotalAmount("D"))
 }
